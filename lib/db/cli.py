@@ -38,12 +38,13 @@ def start(name):
         question_id = index + 1
 
         player_result = PlayerResult(
-            player=player,
-            question_id=question_id,  # Assign the question_id
-            result=Result(result_text=""),  # Placeholder, will be updated later
-            score=score
-        )
-        session.add(player_result)
+        player_id=player.id,  # Assign the player_id
+        question_id=question_id,  # Assign the question_id
+        result_id=0,  # Placeholder, will be updated later
+        score=score
+)
+    session.add(player_result)
+
 
     session.commit()
 
@@ -55,7 +56,9 @@ def start(name):
         result_text = session.query(Result).filter_by(id=1).first().result_text
 
     # Update the result_text for the PlayerResult record
-    player_result.result.result_text = result_text
+    player_result.result_id = session.query(Result).filter_by(result_text=result_text).first().id
+
+
     session.commit()
 
     click.echo(f"drum roll please...: {result_text}")

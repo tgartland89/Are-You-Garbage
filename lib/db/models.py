@@ -36,6 +36,11 @@ class PlayerResult(Base):
     question = relationship('Question')
     result = relationship('Result')
 
+    # Additional columns to store player name and result text
+    player_name = Column(String)
+    result_text = Column(String)
+
+
 # Create the database engine
 engine = create_engine('sqlite:///AYG.db')
 
