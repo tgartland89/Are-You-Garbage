@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 
 Base = declarative_base()
 
@@ -33,3 +35,22 @@ class PlayerResult(Base):
     player = relationship('Player')
     question = relationship('Question')
     result = relationship('Result')
+
+# Create the database engine
+engine = create_engine('sqlite:///AYG.db')
+
+# Create all tables defined in the models
+Base.metadata.create_all(engine)
+
+# Create a session
+Session = sessionmaker(bind=engine)
+session = Session()
+
+# Now you can use the session and interact with the database
+# For example, creating a new player
+player = Player(name='Tom')
+session.add(player)
+session.commit()
+
+# Close the session when you're done
+session.close()
