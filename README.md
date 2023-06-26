@@ -1,4 +1,4 @@
-# Phase 3 CLI Project Template
+# Phase 3 CLI Project Template edited
 
 ## Learning Goals
 
