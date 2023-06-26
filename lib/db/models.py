@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+engine = create_engine('sqlite:///AYG.db')
 
 
 class Player(Base):
@@ -20,7 +21,7 @@ class Question(Base):
 class Result(Base):
     __tablename__ = 'results'
     id = Column(Integer, primary_key=True)
-    score_range = Column(String)
+    score_range = Column(Integer)
     description = Column(String)
 
 
