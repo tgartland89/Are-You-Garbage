@@ -29,7 +29,7 @@ def start(name):
     questions = session.query(Question).all()
     score = 0
 
-    for index, question in enumerate(questions):
+    for index, question in enumerate(questions[:10]):
         answer = click.prompt(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
             score += 1

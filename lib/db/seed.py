@@ -27,8 +27,10 @@ def seed_questions_and_results():
     }
 
     for question_text in questions:
-        question = Question(question_text=question_text)
-        session.add(question)
+        question = session.query(Question).filter_by(question_text=question_text).first()
+        if question is None:
+            question = Question(question_text=question_text)
+            session.add(question)
 
     session.commit()
 
