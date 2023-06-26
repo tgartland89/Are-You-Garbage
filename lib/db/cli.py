@@ -10,9 +10,11 @@ def create_session():
     session = Session()
     return session
 
+
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 @click.argument('name')
@@ -27,10 +29,23 @@ def start(name):
     questions = session.query(Question).all()
     score = 0
 
-    for question in questions:
+    for index, question in enumerate(questions):
         answer = click.prompt(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
             score += 1
+
+        # Assign the question_id based on the loop index
+        question_id = index + 1
+
+        player_result = PlayerResult(
+            player=player,
+            question_id=question_id,  # Assign the question_id
+            result=Result(result_text=""),  # Placeholder, will be updated later
+            score=score
+        )
+        session.add(player_result)
+
+    session.commit()
 
     if score >= 7:
         result_text = session.query(Result).filter_by(id=7).first().result_text
@@ -39,14 +54,16 @@ def start(name):
     else:
         result_text = session.query(Result).filter_by(id=1).first().result_text
 
-    player_result = PlayerResult(player=player, result=Result(result_text=result_text), score=score)
-    session.add(player_result)
+    # Update the result_text for the PlayerResult record
+    player_result.result.result_text = result_text
     session.commit()
 
     click.echo(f"drum roll please...: {result_text}")
 
+
 def main():
     cli()
+
 
 if __name__ == '__main__':
     main()
