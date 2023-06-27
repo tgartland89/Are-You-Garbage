@@ -27,15 +27,23 @@ def seed_questions_and_results():
     }
 
     for question_text in questions:
-        question = Question(question_text=question_text)
-        session.add(question)
+        question = session.query(Question).filter_by(question_text=question_text).first()
+        if question is None:
+            question = Question(question_text=question_text)
+            session.add(question)
+
+    session.commit()
+
+    for score, result_text in results.items():
+        result = Result(result_text=result_text)
+        session.add(result)
 
     session.commit()
 
     for player in session.query(Player):
         yes_count = 0
         for player_question in session.query(Question):
-            answer = click.prompt(player_question.question_text + " (Yes/No): ")
+            answer = input(f"{player_question.question_text} (Yes/No): ")
             if answer.lower() == "yes":
                 yes_count += 1
             player_result = PlayerResult(player=player, question=player_question, score=yes_count)
@@ -55,4 +63,8 @@ def seed_questions_and_results():
 
     session.commit()
 
+# Call the seed_questions_and_results() function
 seed_questions_and_results()
+
+# Close the session
+session.close()
