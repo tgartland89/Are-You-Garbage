@@ -58,7 +58,8 @@ def start(name):
     player_result.result.result_text = result_text
     session.commit()
 
-    click.echo(f"drum roll please...: {result_text}")
+    click.echo("drum roll please...")
+    click.echo(result_text)
 
 
 def main():
