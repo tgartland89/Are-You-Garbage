@@ -20,7 +20,6 @@ def seed_questions_and_results():
         "Do you keep your opened ketchup in the fridge?"
     ]
 
-
     results = {
         7: "Garbage - MAMA MIA!! You are 100'%' GARBAGIO!",
         4: "Trashy - Congrats, you're only a bit Trashy",
@@ -35,10 +34,12 @@ def seed_questions_and_results():
 
     for player in session.query(Player):
         yes_count = 0
-        for question in session.query(Question):
-            answer = input(f"{question.question_text} (Yes/No): ")
+        for player_question in session.query(Question):
+            answer = click.prompt(player_question.question_text + " (Yes/No): ")
             if answer.lower() == "yes":
                 yes_count += 1
+            player_result = PlayerResult(player=player, question=player_question, score=yes_count)
+            session.add(player_result)
 
         if yes_count >= 7:
             result_text = results[7]

@@ -3,23 +3,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question
 
-
-def create_session():
-    engine = create_engine('sqlite:///AYG.db')
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
-
+engine = create_engine('sqlite:///AYG.db')
+Session = sessionmaker(bind=engine)
+session = Session()
 
 @click.group()
 def cli():
     pass
 
-
 @cli.command()
 @click.argument('name')
 def start(name):
-    session = create_session()
     player = Player(name=name)
     session.add(player)
     session.commit()
@@ -29,42 +23,36 @@ def start(name):
     questions = session.query(Question).all()
     score = 0
 
-    for question in questions:
+    for index, question in enumerate(questions):
         answer = click.prompt(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
             score += 1
 
-    # Get the current question from the database
-    current_question = session.query(Question).filter_by(active=True).first()
+        # Assign the question_id based on the loop index
+        question_id = index + 1
 
-    # Create a new PlayerResult instance with the provided question_id
-    player_result = PlayerResult(player=player, result=None, question=current_question, score=score)
+        player_result = PlayerResult(
+            player=player,
+            question_id=question_id,
+            result=Result(result_text=""),
+            score=score
+        )
+        session.add(player_result)
 
-    # Add the player_result to the session and commit the changes
-    session.add(player_result)
-    session.commit()
-
-    result = session.query(Result).filter(Result.id == 7).first()
-    if not result:
         if score >= 7:
-            result = session.query(Result).filter(Result.id == 7).first()
-    elif score >= 4:
-        result = session.query(Result).filter(Result.id == 4).first()
-    else:
-        result = session.query(Result).filter(Result.id == 1).first()
+            result_text = session.query(Result).filter_by(id=7).first().result_text
+        elif score >= 4:
+            result_text = session.query(Result).filter_by(id=4).first().result_text
+        else:
+            result_text = session.query(Result).filter_by(id=1).first().result_text
 
-    if result:
-        result_text = result.result_text
-    player_result = PlayerResult(player=player, result=result, score=score)
-    session.add(player_result)
-    session.commit()
+        player_result.result.result_text = result_text
+        session.commit()
 
     click.echo(f"drum roll please...: {result_text}")
 
-
 def main():
     cli()
-
 
 if __name__ == '__main__':
     main()
