@@ -30,38 +30,43 @@ def start(name):
     score = 0
 
     for index, question in enumerate(questions[:10]):
-        answer = click.prompt(question.question_text + " (Yes/No)").lower()
+        answer = input(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
             score += 1
 
         # Assign the question_id based on the loop index
         question_id = index + 1
 
-        player_result = PlayerResult(
-            player=player,
-            question_id=question_id,  # Assign the question_id
-            result=Result(result_text=""),  # Placeholder, will be updated later
-            score=score
+        session.add(
+            PlayerResult(
+                player=player,
+                question_id=question_id,
+                score=score,
+                result_id=None  # Assign None initially
+            )
         )
-        session.add(player_result)
 
     session.commit()
 
     if score >= 7:
-        result_text = session.query(Result).filter_by(id=7).first().result_text
+        result_id = 7
     elif score >= 4:
-        result_text = session.query(Result).filter_by(id=4).first().result_text
+        result_id = 4
     else:
-        result_text = session.query(Result).filter_by(id=1).first().result_text
+        result_id = 1
 
-    # Update the result_text for the PlayerResult record
-    player_result.result.result_text = result_text
+    result_text = session.query(Result).filter_by(id=result_id).first().result_text
+
+    # Update the result_id for the PlayerResult objects
+    player_results = session.query(PlayerResult).filter_by(player=player).all()
+    for player_result in player_results:
+        player_result.result_id = result_id
+
     session.commit()
 
     click.echo("drum roll please...")
     click.echo(result_text)
-
-
+    
 def main():
     cli()
 
