@@ -27,21 +27,17 @@ def seed_questions_and_results():
     }
 
     for question_text in questions:
-        question = session.query(Question).filter_by(question_text=question_text).first()
-        if question is None:
-            question = Question(question_text=question_text)
-            session.add(question)
+        question = Question(question_text=question_text)
+        session.add(question)
 
     session.commit()
 
     for player in session.query(Player):
         yes_count = 0
-        for player_question in session.query(Question):
-            answer = input(f"{player_question.question_text} (Yes/No): ")
+        for question in session.query(Question):
+            answer = input(f"{question.question_text} (Yes/No): ")
             if answer.lower() == "yes":
                 yes_count += 1
-            player_result = PlayerResult(player=player, question=player_question, score=yes_count)
-            session.add(player_result)
 
         if yes_count >= 7:
             result_text = results[7]
@@ -50,9 +46,13 @@ def seed_questions_and_results():
         else:
             result_text = results[1]
 
-        result = Result(result_text=result_text)
-        player_result = PlayerResult(player=player, result=result, score=yes_count)
-        session.add(result)
+        player_result = PlayerResult(
+            player_id=player.id,
+            player_name=player.name,
+            player_result=result_text
+        )
         session.add(player_result)
 
     session.commit()
+
+seed_questions_and_results()
