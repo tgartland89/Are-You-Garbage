@@ -21,9 +21,9 @@ def seed_questions_and_results():
     ]
 
     results = {
-        7: "Garbage - MAMA MIA!! You are 100'%' GARBAGIO!",
+        1: "Garbage - MAMA MIA!! You are 100'%' GARBAGIO!",
         4: "Trashy - Congrats, you're only a bit Trashy",
-        1: "Classy - You made it baby!!! You're clean livin' & classy!"
+        7: "Classy - You made it baby!!! You're clean livin' & classy!"
     }
 
     for question_text in questions:
@@ -46,22 +46,23 @@ def seed_questions_and_results():
             answer = input(f"{player_question.question_text} (Yes/No): ")
             if answer.lower() == "yes":
                 yes_count += 1
-            player_result = PlayerResult(player=player, question=player_question, score=yes_count)
-            session.add(player_result)
 
         if yes_count >= 7:
             result_text = results[7]
-        elif yes_count >= 4:
+        elif 4 <= yes_count <= 6:
             result_text = results[4]
         else:
             result_text = results[1]
 
-        result = Result(result_text=result_text)
+        result = session.query(Result).filter_by(result_text=result_text).first()
+
         player_result = PlayerResult(player=player, result=result, score=yes_count)
+
         session.add(result)
         session.add(player_result)
 
     session.commit()
+
 
 # Call the seed_questions_and_results() function
 seed_questions_and_results()

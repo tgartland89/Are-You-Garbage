@@ -1,5 +1,5 @@
 import click
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question
 
@@ -27,12 +27,13 @@ def start(name):
     click.echo(f"Welcome, {name}! Let's play 'Are you Garbage?'")
 
     questions = session.query(Question).all()
-    score = 0
 
     for index, question in enumerate(questions[:10]):
         answer = input(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
-            score += 1
+            score = 1  # Assign 1 to score if the answer is yes
+        else:
+            score = 0  # Assign 0 if the answer is no
 
         # Assign the question_id based on the loop index
         question_id = index + 1
@@ -48,12 +49,16 @@ def start(name):
 
     session.commit()
 
+    # Calculate the total score
+    score = session.query(func.sum(PlayerResult.score)).filter_by(player=player).scalar()
+
     if score >= 7:
         result_id = 7
     elif score >= 4:
         result_id = 4
     else:
         result_id = 1
+
 
     result_text = session.query(Result).filter_by(id=result_id).first().result_text
 
@@ -66,6 +71,7 @@ def start(name):
 
     click.echo("drum roll please...")
     click.echo(result_text)
+
     
 def main():
     cli()
