@@ -1,7 +1,7 @@
 import click
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Player, PlayerResult, Result, Question
+from models import Player, PlayerResult, Result, Question, AddedQuestion
 
 
 def create_session():
@@ -59,6 +59,18 @@ def start(name):
     session.commit()
 
     click.echo(f"drum roll please...: {result_text}")
+
+    add_question = click.confirm("Would you like to add a question?")
+
+    if add_question:
+        new_question_text = click.prompt("Enter your question:")
+        added_question = AddedQuestion(question_text=new_question_text)
+        session.add(added_question)
+        session.commit()
+
+        click.echo("Question added successfully!")
+
+    session.close()
 
 
 def main():

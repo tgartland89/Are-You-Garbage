@@ -1,11 +1,3 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from models import Question, Result, Player, PlayerResult
-
-engine = create_engine('sqlite:///AYG.db')
-Session = sessionmaker(bind=engine)
-session = Session()
-
 def seed_questions_and_results():
     questions = [
         "Did you have an above-ground pool as a kid?",
@@ -26,8 +18,21 @@ def seed_questions_and_results():
         1: "Classy - You made it baby!!! You're clean livin' & classy!"
     }
 
+    # Fetch the added questions from the database
+    added_questions = session.query(AddedQuestion).all()
+
+    for added_question in added_questions:
+        questions.append(added_question.question_text)
+
     for question_text in questions:
         question = Question(question_text=question_text)
+        session.add(question)
+
+    # Fetch the added questions from the database
+    added_questions = session.query(AddedQuestion).all()
+
+    for added_question in added_questions:
+        question = Question(question_text=added_question.question_text)
         session.add(question)
 
     session.commit()
@@ -54,3 +59,4 @@ def seed_questions_and_results():
         session.add(player_result)
 
     session.commit()
+
