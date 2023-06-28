@@ -1,4 +1,5 @@
 import click
+import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question, AddedQuestion
@@ -26,10 +27,18 @@ def start(name):
 
     click.echo(f"Welcome, {name}! Let's play 'Are you Garbage?'")
 
-    questions = session.query(Question).all()
+    # Retrieve all questions from the database
+    all_questions = session.query(Question).all()
+
+    # Shuffle the questions randomly
+    random.shuffle(all_questions)
+
+    # Select the first 10 questions
+    selected_questions = all_questions[:10]
+
     score = 0
 
-    for index, question in enumerate(questions):
+    for index, question in enumerate(selected_questions):
         answer = click.prompt(question.question_text + " (Yes/No)").lower()
         if answer == "yes":
             score += 1
@@ -40,7 +49,6 @@ def start(name):
         player_result = PlayerResult(
             player=player,
             question_id=question_id,  # Assign the question_id
-            result=Result(result_text=""),  # Placeholder, will be updated later
             score=score
         )
         session.add(player_result)
@@ -55,7 +63,7 @@ def start(name):
         result_text = session.query(Result).filter_by(id=1).first().result_text
 
     # Update the result_text for the PlayerResult record
-    player_result.result.result_text = result_text
+    player_result.result = Result(result_text=result_text)
     session.commit()
 
     click.echo(f"drum roll please...: {result_text}")
@@ -63,9 +71,7 @@ def start(name):
     add_question = click.confirm("Would you like to add a question?")
 
     if add_question:
-        new_question_text = click.prompt("Enter your question:")
-        added_question = AddedQuestion(question_text=new_question_text)
-        session.add(added_question)
+        session.add_all([AddedQuestion(question_text=click.prompt("Enter your question:"))])
         session.commit()
 
         click.echo("Question added successfully!")
