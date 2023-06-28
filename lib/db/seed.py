@@ -27,16 +27,8 @@ def seed_questions_and_results():
     }
 
     for question_text in questions:
-        question = session.query(Question).filter_by(question_text=question_text).first()
-        if question is None:
-            question = Question(question_text=question_text)
-            session.add(question)
-
-    session.commit()
-
-    for score, result_text in results.items():
-        result = Result(result_text=result_text)
-        session.add(result)
+        question = Question(question_text=question_text)
+        session.add(question)
 
     session.commit()
 
@@ -62,9 +54,3 @@ def seed_questions_and_results():
         session.add(player_result)
 
     session.commit()
-
-# Call the seed_questions_and_results() function
-seed_questions_and_results()
-
-# Close the session
-session.close()
