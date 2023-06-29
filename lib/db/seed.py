@@ -1,63 +1,77 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
+from models import Player, PlayerResult, Result, Question, AddedQuestion
 
-Base = declarative_base()
+def seed_questions_and_results(name):
+    questions = [
+        "Did you have an above-ground pool as a kid?",
+        "Did you drink milk with dinner as a kid?",
+        "Are you leaving more than $200 in the envelope at a close friend's or family member's wedding?",
+        "Have you ever hidden from the cops for lighting off fireworks?",
+        "Do you always tip 20% or more?",
+        "Have you dined and dashed?",
+        "Has anyone ever had a power of attorney over you?",
+        "Have you or anyone in your family represented themselves in court?",
+        "Do you keep your opened syrup in the pantry?",
+        "Do you keep your opened ketchup in the fridge?"
+    ]
 
-class Player(Base):
-    __tablename__ = 'players'
+    results = {
+        7: "Garbage - MAMA MIA!! You are 100% GARBAGIO!",
+        4: "Trashy - Congrats, you're only a bit Trashy",
+        1: "Classy - You made it baby!!! You're clean livin' & classy!"
+    }
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
+    session = create_session()
 
-class Question(Base):
-    __tablename__ = 'questions'
+    # Fetch the added questions from the database
+    added_questions = session.query(AddedQuestion).all()
+    existing_questions = session.query(Question).filter(Question.question_text.in_(questions)).all()
+    existing_question_texts = set(question.question_text for question in existing_questions)
 
-    id = Column(Integer, primary_key=True)
-    question_text = Column(String)
+    for added_question in added_questions:
+        if added_question.question_text not in existing_question_texts:
+            questions.append(added_question.question_text)
 
-class Result(Base):
-    __tablename__ = 'results'
+    for question_text in questions:
+        if question_text not in existing_question_texts:
+            question = Question(question_text=question_text)
+            session.add(question)
 
-    id = Column(Integer, primary_key=True)
-    result_text = Column(String)
+    session.commit()
 
-class PlayerResult(Base):
-    __tablename__ = 'player_results'
+    # Populate the results table
+    for result_id, result_text in results.items():
+        result = Result(id=result_id, result_text=result_text)
+        session.add(result)
 
-    player_id = Column(Integer, ForeignKey('players.id'), primary_key=True)
-    question_id = Column(Integer, ForeignKey('questions.id'), primary_key=True)
-    result_id = Column(Integer, ForeignKey('results.id'))
-    score = Column(Integer)
+    session.commit()
 
-    player = relationship('Player')
-    question = relationship('Question')
-    result = relationship('Result')
+    for player in session.query(Player):
+        yes_count = 0
+        for player_question in session.query(Question):
+            answer = input(f"{player_question.question_text} (Yes/No): ")
+            if answer.lower() == "yes":
+                yes_count += 1
+            player_result = PlayerResult(player=player, question=player_question, score=yes_count)
+            session.add(player_result)
 
-class AddedQuestion(Base):
-    __tablename__ = 'added_questions'
+        if yes_count >= 7:
+            result_id = 7
+        elif yes_count >= 4:
+            result_id = 4
+        else:
+            result_id = 1
 
-    id = Column(Integer, primary_key=True)
-    question_text = Column(String)
+        # Retrieve the corresponding Result object based on the result_id
+        result = session.query(Result).filter_by(id=result_id).first()
+
+        # Assign the result object to player_result.result
+        player_result.result = result
+
+    session.commit()
+
+    session.close()
 
 
-# Create the database engine
-engine = create_engine('sqlite:///AYG.db')
-
-# Create all tables defined in the models
-Base.metadata.create_all(engine)
-
-# Create a session
-Session = sessionmaker(bind=engine)
-session = Session()
-
-# Now you can use the session and interact with the database
-# For example, creating a new player
-player = Player(name='Tom')
-session.add(player)
-session.commit()
-
-# Close the session when you're done
-session.close()
+seed_questions_and_results(name="")

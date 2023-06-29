@@ -53,11 +53,6 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Now you can use the session and interact with the database
-# For example, creating a new player
-player = Player(name='Tom')
-session.add(player)
-session.commit()
 
 # Close the session when you're done
 session.close()
