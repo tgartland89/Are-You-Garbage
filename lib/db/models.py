@@ -27,6 +27,10 @@ class Result(Base):
 class PlayerResult(Base):
     __tablename__ = 'player_results'
 
+# PlayerResult class represents the association table between Player and Question (many to many). 
+# The table has three foreign key columns: player_id, question_id, and result_id. 
+# These foreign keys establish the relationship between the Player, Question, and Result entities.
+
     player_id = Column(Integer, ForeignKey('players.id'), primary_key=True)
     question_id = Column(Integer, ForeignKey('questions.id'), primary_key=True)
     result_id = Column(Integer, ForeignKey('results.id'))
