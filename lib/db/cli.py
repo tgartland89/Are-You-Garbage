@@ -10,7 +10,6 @@ def create_session():
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
-
 def seed_questions_and_results(name):
     session = create_session()
 
@@ -74,9 +73,11 @@ def seed_questions_and_results(name):
 
     session.close()
 
+
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 @click.argument('name')
@@ -117,20 +118,18 @@ def start(name):
         )
         session.add(player_result)
 
-    session.commit()
+        if score >= 7:
+            result_id = 7
+        elif score >= 4:
+            result_id = 4
+        else:
+            result_id = 1
 
-    if score >= 7:
-        result_id = 7
-    elif score >= 4:
-        result_id = 4
-    else:
-        result_id = 1
+        # Retrieve the corresponding Result object based on the result_id
+        result = session.query(Result).filter_by(id=result_id).first()
 
-    # Retrieve the corresponding Result object based on the result_id
-    result = session.query(Result).filter_by(id=result_id).first()
-
-    # Assign the result object to the player_result.result
-    player_result.result = result
+        # Assign the result object to the player_result.result
+        player_result.result = result
 
     session.commit()
 
@@ -151,6 +150,7 @@ def start(name):
         click.echo("Question added successfully!")
 
     session.close()
+
 
 def main():
     cli()
