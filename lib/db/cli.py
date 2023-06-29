@@ -97,6 +97,7 @@ def start(name):
     click.echo(f"Thank you, {name}! Don't forget to rate, review, and subscribe on YouTube, Spotify, and Apple to keep those numbers THROUGH THE ROOF!")
     click.echo("Now let's start the show!")
 
+
     # Retrieve all questions from the database
     all_questions = session.query(Question).all()
 
@@ -137,12 +138,8 @@ def start(name):
 
     session.commit()
 
-    drum_roll = pyfiglet.figlet_format("Drum Roll Please")
     result_text = result.result_text
-    result_text_ascii = pyfiglet.figlet_format(result_text)
-
-    click.echo(drum_roll)
-    click.echo(result_text_ascii)
+    click.echo(f"drum roll please...: {result_text}")
 
     add_question = click.confirm("Would you like to add a question?")
 
