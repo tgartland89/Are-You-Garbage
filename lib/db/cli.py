@@ -3,6 +3,8 @@ import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question, AddedQuestion
+import pyfiglet
+
 
 
 def create_session():
@@ -28,12 +30,6 @@ def seed_questions_and_results(name):
         "Do you keep your opened ketchup in the fridge?"
     ]
 
-    results = {
-        7: "Garbage - MAMA MIA!! You are 100% GARBAGIO!",
-        4: "Trashy - Congrats, you're only a bit Trashy",
-        1: "Classy - You made it baby!!! You're clean livin' & classy!"
-    }
-
     # Fetch the added questions from the database
     added_questions = session.query(AddedQuestion).all()
     existing_questions = session.query(Question).filter(Question.question_text.in_(questions)).all()
@@ -47,13 +43,6 @@ def seed_questions_and_results(name):
         if question_text not in existing_question_texts:
             question = Question(question_text=question_text)
             session.add(question)
-
-    session.commit()
-
-    # Populate the results table
-    for result_id, result_text in results.items():
-        result = Result(id=result_id, result_text=result_text)
-        session.add(result)
 
     session.commit()
 
@@ -102,7 +91,11 @@ def start(name):
     session.add(player)
     session.commit()
 
-    click.echo(f"Welcome, {name}! Let's play 'Are you Garbage?'")
+    title = pyfiglet.figlet_format("Are You Garbage?")
+    click.echo(title)
+    click.echo("Welcome to Are you Garbage?! Who do I have the pleasure of judging today?")
+    click.echo(f"Thank you, {name}! Don't forget to rate, review, and subscribe on YouTube, Spotify, and Apple to keep those numbers THROUGH THE ROOF!")
+    click.echo("Now let's start the show!")
 
     # Retrieve all questions from the database
     all_questions = session.query(Question).all()
@@ -120,12 +113,9 @@ def start(name):
         if answer == "yes":
             score += 1
 
-        # Assign the question_id based on the loop index
-        question_id = index + 1
-
         player_result = PlayerResult(
             player=player,
-            question_id=question_id,  # Assign the question_id
+            question=question,
             score=score
         )
         session.add(player_result)
@@ -133,17 +123,26 @@ def start(name):
     session.commit()
 
     if score >= 7:
-        result_text = session.query(Result).filter_by(id=7).first().result_text
+        result_id = 7
     elif score >= 4:
-        result_text = session.query(Result).filter_by(id=4).first().result_text
+        result_id = 4
     else:
-        result_text = session.query(Result).filter_by(id=1).first().result_text
+        result_id = 1
 
-    # Update the result_text for the PlayerResult record
-    player_result.result = Result(result_text=result_text)
+    # Retrieve the corresponding Result object based on the result_id
+    result = session.query(Result).filter_by(id=result_id).first()
+
+    # Assign the result object to the player_result.result
+    player_result.result = result
+
     session.commit()
 
-    click.echo(f"drum roll please...: {result_text}")
+    drum_roll = pyfiglet.figlet_format("Drum Roll Please")
+    result_text = result.result_text
+    result_text_ascii = pyfiglet.figlet_format(result_text)
+
+    click.echo(drum_roll)
+    click.echo(result_text_ascii)
 
     add_question = click.confirm("Would you like to add a question?")
 
@@ -154,6 +153,7 @@ def start(name):
         click.echo("Question added successfully!")
 
     session.close()
+
 
 
 def main():
