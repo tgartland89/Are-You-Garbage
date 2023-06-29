@@ -51,29 +51,28 @@ def seed_questions_and_results(name):
     session.add(player)
     session.commit()
 
-    for player in session.query(Player):
-        yes_count = 0
-        for player_question in session.query(Question):
-            answer = input(f"{player_question.question_text} (Yes/No): ")
-            if answer.lower() == "yes":
-                yes_count += 1
-            player_result = PlayerResult(player=player, question=player_question, score=yes_count)
-            session.add(player_result)
+    for player_question in session.query(Question):
+        answer = input(f"{player_question.question_text} (Yes/No): ")
+    if answer.lower() == "yes":
+        yes_count += 1
+    player_result = PlayerResult(player=player, question=player_question, score=yes_count)
+    session.add(player_result)
 
-        if yes_count >= 7:
-            result_id = 7
-        elif yes_count >= 4:
-            result_id = 4
-        else:
-            result_id = 1
+    if yes_count >= 7:
+        result_id = 7
+    elif yes_count >= 4:
+        result_id = 4
+    else:
+        result_id = 1
 
-        # Retrieve the corresponding Result object based on the result_id
-        result = session.query(Result).filter_by(id=result_id).first()
+    # Retrieve the corresponding Result object based on the result_id
+    result = session.query(Result).filter_by(id=result_id).first()
 
-        # Assign the result object to player_result.result
-        player_result.result = result
+    # Assign the result object to player_result.result
+    player_result.result = result
 
     session.commit()
+
 
     session.close()
 
