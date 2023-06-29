@@ -42,7 +42,6 @@ class AddedQuestion(Base):
     id = Column(Integer, primary_key=True)
     question_text = Column(String)
 
-
 # Create the database engine
 engine = create_engine('sqlite:///AYG.db')
 
@@ -52,7 +51,6 @@ Base.metadata.create_all(engine)
 # Create a session
 Session = sessionmaker(bind=engine)
 session = Session()
-
 
 # Close the session when you're done
 session.close()

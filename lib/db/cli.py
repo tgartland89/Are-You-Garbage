@@ -11,7 +11,6 @@ def create_session():
     session = Session()
     return session
 
-
 def seed_questions_and_results(name):
     session = create_session()
 
@@ -75,11 +74,9 @@ def seed_questions_and_results(name):
 
     session.close()
 
-
 @click.group()
 def cli():
     pass
-
 
 @cli.command()
 @click.argument('name')
@@ -154,8 +151,6 @@ def start(name):
         click.echo("Question added successfully!")
 
     session.close()
-
-
 
 def main():
     cli()

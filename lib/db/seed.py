@@ -29,7 +29,6 @@ def seed_questions_and_results():
 
     # Close the session when you're done
     session.close()
-
-
+    
 if __name__ == '__main__':
     seed_questions_and_results()
