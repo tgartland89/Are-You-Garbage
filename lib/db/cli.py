@@ -5,8 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question, AddedQuestion
 import pyfiglet
 
-
-
 def create_session():
     engine = create_engine('sqlite:///AYG.db')
     Session = sessionmaker(bind=engine)
@@ -94,8 +92,10 @@ def start(name):
     title = pyfiglet.figlet_format("Are You Garbage?")
     click.echo(title)
     click.echo("Welcome to Are you Garbage?! Who do I have the pleasure of judging today?")
+    click.echo()
     click.echo(f"Thank you, {name}! Don't forget to rate, review, and subscribe on YouTube, Spotify, and Apple to keep those numbers THROUGH THE ROOF!")
     click.echo("Now let's start the show!")
+    click.echo()
 
     # Retrieve all questions from the database
     all_questions = session.query(Question).all()
@@ -143,6 +143,7 @@ def start(name):
 
     click.echo(drum_roll)
     click.echo(result_text_ascii)
+    click.echo()
 
     add_question = click.confirm("Would you like to add a question?")
 
