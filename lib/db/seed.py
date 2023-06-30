@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import Player, PlayerResult, Result, Question, AddedQuestion, Base
 
+# in this function, there is CRUD happening to the questions  table 
 def seed_questions_and_results():
     # Create the database engine
     engine = create_engine('sqlite:///AYG.db')

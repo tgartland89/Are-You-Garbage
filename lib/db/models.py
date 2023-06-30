@@ -6,18 +6,21 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+# one of my realted tables- this is realted to queston and results 
 class Player(Base):
     __tablename__ = 'players'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
+# one of my realted tables- this is realted to players and results 
 class Question(Base):
     __tablename__ = 'questions'
 
     id = Column(Integer, primary_key=True)
     question_text = Column(String)
 
+# one of my realted tables- this is realted to queston and players 
 class Result(Base):
     __tablename__ = 'results'
 
@@ -27,7 +30,7 @@ class Result(Base):
 class PlayerResult(Base):
     __tablename__ = 'player_results'
 
-# PlayerResult class represents the association table between Player and Question (many to many). 
+# class represents the association table between Player and Question in a many to many reltionshipe. 
 # The table has three foreign key columns: player_id, question_id, and result_id. 
 # These foreign keys establish the relationship between the Player, Question, and Result entities.
 

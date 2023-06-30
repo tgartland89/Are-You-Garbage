@@ -1,4 +1,5 @@
-import click
+# the import click library implements the cli 
+import click 
 import random
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
