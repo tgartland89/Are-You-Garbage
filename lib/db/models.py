@@ -13,7 +13,8 @@ class Player(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
 
-# one of my realted tables- this is realted to players and results 
+# one of my realted tables- this is realted to players and results
+# here is also where I can perfom full crud tied to my seed_questions_and_results in cli.py 
 class Question(Base):
     __tablename__ = 'questions'
 

@@ -11,6 +11,8 @@ def create_session():
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
+
+# tied to the questions table in models.py to perfom full CRUD on the 'questions' table 
 def seed_questions_and_results(name):
     session = create_session()
 
@@ -55,6 +57,15 @@ def seed_questions_and_results(name):
             if answer.lower() == "yes":
                 yes_count += 1
             player_result = PlayerResult(player=player, question=player_question, score=yes_count)
+   
+    # this line needed to be changed to the abovefix my NULL errors:
+    # player_result = PlayerResult(player=player, question=player_question, score=yes_count, result_id=None)
+    # removedresult_id=none 
+    
+    # the new line creates a new PlayerResult object and initializes with the player, question, and score values. 
+    # However, the result_id attribute of the PlayerResult object needs explicitly set, 
+    # which means it will be assigned the default value for integers, which is 0.
+
             session.add(player_result)
 
         if yes_count >= 7:
@@ -159,3 +170,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
